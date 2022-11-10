@@ -15,7 +15,12 @@ class GatewayConfigAdmin extends AbstractAdmin
     protected FormFactoryInterface $formFactory;
     protected ?CypherInterface $cypher;
 
-    public function setFormFactory(FormFactoryInterface $formFactory): void
+	public function __construct(CypherInterface $cypher)
+	{
+		$this->cypher = $cypher;
+	}
+
+	public function setFormFactory(FormFactoryInterface $formFactory): void
     {
         $this->formFactory = $formFactory;
     }
