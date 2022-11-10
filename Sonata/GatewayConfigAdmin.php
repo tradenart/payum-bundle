@@ -1,4 +1,5 @@
 <?php
+
 namespace Payum\Bundle\PayumBundle\Sonata;
 
 use Payum\Core\Security\CryptedInterface;
@@ -12,94 +13,93 @@ use Payum\Core\Bridge\Symfony\Form\Type\GatewayConfigType;
 
 class GatewayConfigAdmin extends AbstractAdmin
 {
-    protected FormFactoryInterface $formFactory;
-    protected ?CypherInterface $cypher;
+	protected FormFactoryInterface $formFactory;
+	protected ?CypherInterface     $cypher = NULL;
 
 	public function setFormFactory(FormFactoryInterface $formFactory): void
-    {
-        $this->formFactory = $formFactory;
-    }
+	{
+		$this->formFactory = $formFactory;
+	}
 
-    public function setCypher(CypherInterface $cypher): void
-    {
-        $this->cypher = $cypher;
-    }
+	public function setCypher(CypherInterface $cypher): void
+	{
+		$this->cypher = $cypher;
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configureFormFields(FormMapper $form): void
-    {
-        $form->reorder(array()); //hack!
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function preUpdate($object): void
+	{
+		parent::preUpdate($object);
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function configureListFields(ListMapper $list): void
-    {
-        $list
-            ->add('gatewayName')
-            ->add('factoryName')
-            ->add('config', 'array')
-            ->add('_action', 'actions', array(
-                'actions' => array(
-                    'edit' => array(),
-                    'delete' => array(),
-                )
-            ))
-        ;
-    }
+		if ($this->cypher && $object instanceof CryptedInterface) {
+			$object->encrypt($this->cypher);
+		}
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function preUpdate($object): void
-    {
-        parent::preUpdate($object);
+	/**
+	 * {@inheritdoc}
+	 */
+	public function prePersist($object): void
+	{
+		parent::prePersist($object);
 
-        if ($this->cypher && $object instanceof CryptedInterface) {
-            $object->encrypt($this->cypher);
-        }
-    }
+		if ($this->cypher && $object instanceof CryptedInterface) {
+			$object->encrypt($this->cypher);
+		}
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function prePersist($object): void
-    {
-        parent::prePersist($object);
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getObject($id)
+	{
+		$object = parent::getObject($id);
 
-        if ($this->cypher && $object instanceof CryptedInterface) {
-            $object->encrypt($this->cypher);
-        }
-    }
+		if ($this->cypher && $object instanceof CryptedInterface) {
+			$object->decrypt($this->cypher);
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getObject($id)
-    {
-        $object = parent::getObject($id);
+		return $object;
+	}
 
-        if ($this->cypher && $object instanceof CryptedInterface) {
-            $object->decrypt($this->cypher);
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getFormBuilder(): FormBuilderInterface
+	{
+		$formBuilder = $this->formFactory->createBuilder(GatewayConfigType::class, $this->getSubject(), array(
+			'data_class' => get_class($this->getSubject()),
+		));
 
-        return $object;
-    }
+		$this->defineFormBuilder($formBuilder);
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getFormBuilder(): FormBuilderInterface
-    {
-        $formBuilder = $this->formFactory->createBuilder(GatewayConfigType::class, $this->getSubject(), array(
-            'data_class' => get_class($this->getSubject()),
-        ));
+		return $formBuilder;
+	}
 
-        $this->defineFormBuilder($formBuilder);
+	/**
+	 * {@inheritdoc}
+	 */
+	protected function configureFormFields(FormMapper $form): void
+	{
+		$form->reorder(array()); //hack!
+	}
 
-        return $formBuilder;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	protected function configureListFields(ListMapper $list): void
+	{
+		$list
+			->add('gatewayName')
+			->add('factoryName')
+			->add('config', 'array')
+			->add('_action', 'actions', array(
+				'actions' => array(
+					'edit'   => array(),
+					'delete' => array(),
+				)
+			));
+	}
 }
