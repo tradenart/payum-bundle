@@ -19,13 +19,15 @@ class PaymentDetails extends ArrayObject
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
+     *
+     * @var integer $id
      */
-    protected int $id;
+    protected $id;
 }
 ```
 
 ```yml
-#config/packages/payum.yml
+#app/config/config.yml
 
 payum:
     storages:

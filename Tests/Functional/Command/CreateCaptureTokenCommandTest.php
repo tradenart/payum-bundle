@@ -14,7 +14,7 @@ class CreateCaptureTokenCommandTest extends WebTestCase
     /**
      * @test
      */
-    public function shouldCreateCaptureTokenWithUrlAsAfterUrl(): void
+    public function shouldCreateCaptureTokenWithUrlAsAfterUrl()
     {
         /** @var RegistryInterface $payum */
         $payum = $this->client->getContainer()->get('payum');
@@ -27,23 +27,23 @@ class CreateCaptureTokenCommandTest extends WebTestCase
 
         $modelId = $storage->identify($model)->getId();
 
-        $output = $this->executeConsole(new CreateCaptureTokenCommand($payum), array(
+        $output = $this->executeConsole(new CreateCaptureTokenCommand, array(
             'gateway-name' => 'fooGateway',
             '--model-class' => $modelClass,
             '--model-id' => $modelId,
             '--after-url' => 'http://google.com/'
         ));
 
-        $this->assertStringContainsString('Hash: ', $output);
-        $this->assertStringContainsString('Url: http://localhost/payment/capture', $output);
-        $this->assertStringContainsString('After Url: http://google.com/?payum_token=', $output);
-        $this->assertStringContainsString("Details: $modelClass#$modelId", $output);
+        $this->assertContains('Hash: ', $output);
+        $this->assertContains('Url: http://localhost/payment/capture', $output);
+        $this->assertContains('After Url: http://google.com/?payum_token=', $output);
+        $this->assertContains("Details: $modelClass#$modelId", $output);
     }
 
     /**
      * @test
      */
-    public function shouldCreateCaptureTokenWithRouteAsAfterUrl(): void
+    public function shouldCreateCaptureTokenWithRouteAsAfterUrl()
     {
         /** @var RegistryInterface $payum */
         $payum = $this->client->getContainer()->get('payum');
@@ -56,23 +56,26 @@ class CreateCaptureTokenCommandTest extends WebTestCase
 
         $modelId = $storage->identify($model)->getId();
 
-        $output = $this->executeConsole(new CreateCaptureTokenCommand($payum), array(
+        $output = $this->executeConsole(new CreateCaptureTokenCommand, array(
             'gateway-name' => 'fooGateway',
             '--model-class' => $modelClass,
             '--model-id' => $modelId,
             '--after-url' => 'foo'
         ));
 
-        $this->assertStringContainsString('Hash: ', $output);
-        $this->assertStringContainsString('Url: http://localhost/payment/capture', $output);
-        $this->assertStringContainsString('After Url: http://localhost/foo/url?payum_token=', $output);
-        $this->assertStringContainsString("Details: $modelClass#$modelId", $output);
+        $this->assertContains('Hash: ', $output);
+        $this->assertContains('Url: http://localhost/payment/capture', $output);
+        $this->assertContains('After Url: http://localhost/foo/url?payum_token=', $output);
+        $this->assertContains("Details: $modelClass#$modelId", $output);
     }
 
     /**
+     * @param Command  $command
      * @param string[] $arguments
+     *
+     * @return string
      */
-    protected function executeConsole(Command $command, array $arguments = array()): string
+    protected function executeConsole(Command $command, array $arguments = array())
     {
         $command->setApplication(new Application($this->client->getKernel()));
         if ($command instanceof ContainerAwareInterface) {

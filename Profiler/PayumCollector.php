@@ -7,24 +7,23 @@ use Payum\Core\Request\Generic;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\VarDumper\Cloner\Data;
 
 class PayumCollector extends DataCollector implements ExtensionInterface
 {
     /**
      * @var Context[]
      */
-    private array $contexts = [];
+    private $contexts = [];
 
     /**
-     * @var array|Data
+     * @var array
      */
     protected $data = [];
 
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Throwable $exception = null): void
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         foreach ($this->contexts as $context) {
             $request = $context->getRequest();
@@ -44,7 +43,9 @@ class PayumCollector extends DataCollector implements ExtensionInterface
             ];
 
             if ($request instanceof Generic) {
-                $contextData['model_class'] = get_debug_type($request->getModel())
+                $contextData['model_class'] = is_object($request->getModel()) ?
+                    get_class($request->getModel()) :
+                    gettype($request->getModel())
                 ;
 
                 $contextData['model_short_class'] = is_object($request->getModel()) ?
@@ -75,7 +76,7 @@ class PayumCollector extends DataCollector implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getName(): string
+    public function getName()
     {
         return 'payum';
     }
@@ -83,7 +84,7 @@ class PayumCollector extends DataCollector implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function onPreExecute(Context $context): void
+    public function onPreExecute(Context $context)
     {
         $this->contexts[] = $context;
     }
@@ -91,29 +92,34 @@ class PayumCollector extends DataCollector implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function onExecute(Context $context): void
+    public function onExecute(Context $context)
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function onPostExecute(Context $context): void
+    public function onPostExecute(Context $context)
     {
     }
 
-    private function getShortClass(object $object): string
+    /**
+     * @param object $object
+     *
+     * @return string
+     */
+    private function getShortClass($object)
     {
         return (new \ReflectionClass($object))->getShortName();
     }
 
-    public function dump(): string
+    public function dump()
     {
         $str = '';
         $previousContext = null;
 
         foreach ($this->data as $index => $contextData) {
-            if ($contextData['deep'] === 0) {
+            if ($contextData['deep'] == 0) {
                 $str .= $this->formatRequest($contextData).PHP_EOL;
 
                 continue;
@@ -123,11 +129,11 @@ class PayumCollector extends DataCollector implements ExtensionInterface
                 $str .= $this->formatAction($contextData).PHP_EOL;
             }
 
-            if (false === array_key_exists($index + 1, $this->data) && $contextData['reply_class']) {
+            if (false == array_key_exists($index + 1, $this->data) && $contextData['reply_class']) {
                 $str .= $this->formatReply($contextData).PHP_EOL;
             }
 
-            if (false === array_key_exists($index + 1, $this->data) && $contextData['exception_class']) {
+            if (false == array_key_exists($index + 1, $this->data) && $contextData['exception_class']) {
                 $str .= $this->formatException($contextData).PHP_EOL;
             }
         }
@@ -135,13 +141,13 @@ class PayumCollector extends DataCollector implements ExtensionInterface
         return $str;
     }
 
-    public function reset(): void
+    public function reset()
     {
         $this->contexts = [];
         $this->data = [];
     }
 
-    protected function formatAction(array $contextData): string
+    protected function formatAction(array $contextData)
     {
         return sprintf(
             '%s└ %s::execute(%s)',
@@ -151,25 +157,29 @@ class PayumCollector extends DataCollector implements ExtensionInterface
         );
     }
 
-    protected function formatReply(array $contextData): string
+    protected function formatReply(array $contextData)
     {
-        return sprintf(
+        $str = sprintf(
             '%s reply %s',
             sprintf('%s ⬅', str_repeat(' ', $contextData['deep'])),
             $contextData['reply_short_class']
         );
+
+        return $str;
     }
 
-    protected function formatException(array $contextData): string
+    protected function formatException(array $contextData)
     {
-        return sprintf(
+        $str = sprintf(
             '%s exception %s',
             sprintf('%s ⬅', str_repeat(' ', $contextData['deep'])),
             $contextData['exception_short_class']
         );
+
+        return $str;
     }
 
-    protected function formatRequest(array $contextData): string
+    protected function formatRequest(array $contextData)
     {
         return sprintf(
             '%s[%s]',

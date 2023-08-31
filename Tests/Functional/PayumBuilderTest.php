@@ -9,73 +9,58 @@ use Payum\Core\PayumBuilder;
 
 class PayumBuilderTest extends WebTestCase
 {
-    public function testCouldBeGetFromContainerAsService(): void
+    public function testCouldBeGetFromContainerAsService()
     {
         /** @var PayumBuilder $builder */
-        $builder = static::getContainer()->get('payum.builder');
+        $builder = static::$container->get('payum.builder');
 
         $this->assertInstanceOf(PayumBuilder::class, $builder);
     }
 
-
-    public function testShouldContainCoreGatewayFactoryBuilder(): void
+    public function testShouldContainCoreGatewayFactoryBuilder()
     {
         /** @var PayumBuilder $builder */
-        $builder = static::getContainer()->get('payum.builder');
+        $builder = static::$container->get('payum.builder');
 
-        $reflectedConstraint = (new \ReflectionObject($builder))->getProperty('coreGatewayFactory');
-        $reflectedConstraint->setAccessible(true);
-        $constraint = $reflectedConstraint->getValue($builder);
-        $this->assertInstanceOf(CoreGatewayFactoryBuilder::class, $constraint);
+        $this->assertAttributeInstanceOf(CoreGatewayFactoryBuilder::class, 'coreGatewayFactory', $builder);
     }
 
-    public function testShouldContainHttpRequestVerifierBuilder(): void
+    public function testShouldContainHttpRequestVerifierBuilder()
     {
         /** @var PayumBuilder $builder */
-        $builder = static::getContainer()->get('payum.builder');
+        $builder = static::$container->get('payum.builder');
 
-        $reflectedConstraint = (new \ReflectionObject($builder))->getProperty('httpRequestVerifier');
-        $reflectedConstraint->setAccessible(true);
-        $constraint = $reflectedConstraint->getValue($builder);
-        $this->assertInstanceOf(HttpRequestVerifierBuilder::class, $constraint);
+        $this->assertAttributeInstanceOf(HttpRequestVerifierBuilder::class, 'httpRequestVerifier', $builder);
     }
 
-    public function testShouldContainTokenFactoryBuilder(): void
+    public function testShouldContainTokenFactoryBuilder()
     {
         /** @var PayumBuilder $builder */
-        $builder = static::getContainer()->get('payum.builder');
+        $builder = static::$container->get('payum.builder');
 
-        $reflectedConstraint = (new \ReflectionObject($builder))->getProperty('tokenFactory');
-        $reflectedConstraint->setAccessible(true);
-        $constraint = $reflectedConstraint->getValue($builder);
-        $this->assertInstanceOf(TokenFactoryBuilder::class, $constraint);
+        $this->assertAttributeInstanceOf(TokenFactoryBuilder::class, 'tokenFactory', $builder);
     }
 
-    public function testShouldContainMainRegistry(): void
+    public function testShouldContainMainRegistry()
     {
         /** @var PayumBuilder $builder */
-        $builder = static::getContainer()->get('payum.builder');
+        $builder = static::$container->get('payum.builder');
 
-        $reflectedConstraint = (new \ReflectionObject($builder))->getProperty('mainRegistry');
-        $reflectedConstraint->setAccessible(true);
-        $constraint = $reflectedConstraint->getValue($builder);
-        $this->assertInstanceOf(ContainerAwareRegistry::class, $constraint);
+        $this->assertAttributeInstanceOf(ContainerAwareRegistry::class, 'mainRegistry', $builder);
     }
 
-    public function testShouldContainGenericTokenFactoryPaths(): void
+    public function testShouldContainGenericTokenFactoryPaths()
     {
         /** @var PayumBuilder $builder */
-        $builder = static::getContainer()->get('payum.builder');
+        $builder = static::$container->get('payum.builder');
 
-        $reflectedConstraint = (new \ReflectionObject($builder))->getProperty('genericTokenFactoryPaths');
-        $reflectedConstraint->setAccessible(true);
-        $constraint = $reflectedConstraint->getValue($builder);
-
-        $this->assertEquals('payum_capture_do', $constraint['capture']);
-        $this->assertEquals('payum_notify_do', $constraint['notify']);
-        $this->assertEquals('payum_authorize_do', $constraint['authorize']);
-        $this->assertEquals('payum_refund_do', $constraint['refund']);
-        $this->assertEquals('payum_cancel_do', $constraint['cancel']);
-        $this->assertEquals('payum_payout_do', $constraint['payout']);
+        $this->assertAttributeEquals([
+            'capture' => 'payum_capture_do',
+            'notify' => 'payum_notify_do',
+            'authorize' => 'payum_authorize_do',
+            'refund' => 'payum_refund_do',
+            'cancel' => 'payum_cancel_do',
+            'payout' => 'payum_payout_do',
+        ], 'genericTokenFactoryPaths', $builder);
     }
 }

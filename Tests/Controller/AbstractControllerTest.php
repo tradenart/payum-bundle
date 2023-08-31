@@ -2,14 +2,12 @@
 
 namespace Payum\Bundle\PayumBundle\Tests\Controller;
 
-use Payum\Core\GatewayInterface;
 use Payum\Core\Model\Token;
 use Payum\Core\Payum;
 use Payum\Core\Registry\RegistryInterface;
 use Payum\Core\Security\GenericTokenFactoryInterface;
 use Payum\Core\Security\HttpRequestVerifierInterface;
 use Payum\Core\Storage\StorageInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -18,19 +16,12 @@ abstract class AbstractControllerTest extends TestCase
     protected const GATEWAY_NAME = 'theGateway';
     protected const AFTER_URL = 'http://example.com/theAfterUrl';
 
-    protected Token $token;
-
-    /** @var RegistryInterface&MockObject */
+    protected $token;
     protected $httpRequestVerifierMock;
-
-    /** @var GatewayInterface&MockObject */
     protected $gatewayMock;
-
-    /** @var RegistryInterface&MockObject */
     protected $registryMock;
-
-    protected Payum $payum;
-    protected Request $request;
+    protected $payum;
+    protected $request;
 
     protected function setUp(): void
     {
@@ -45,11 +36,13 @@ abstract class AbstractControllerTest extends TestCase
             HttpRequestVerifierInterface::class
         );
         $this->httpRequestVerifierMock
+            ->expects($this->any())
             ->method('verify')
             ->with($this->identicalTo($this->request))
-            ->willReturn($this->token);
+            ->will($this->returnValue($this->token));
 
         $this->httpRequestVerifierMock
+            ->expects($this->any())
             ->method('invalidate')
             ->with($this->identicalTo($this->token));
 
@@ -57,9 +50,10 @@ abstract class AbstractControllerTest extends TestCase
 
         $this->registryMock = $this->createMock(RegistryInterface::class);
         $this->registryMock
+            ->expects($this->any())
             ->method('getGateway')
             ->with(self::GATEWAY_NAME)
-            ->willReturn($this->gatewayMock);
+            ->will($this->returnValue($this->gatewayMock));
 
         $this->payum = new Payum(
             $this->registryMock,
@@ -69,5 +63,5 @@ abstract class AbstractControllerTest extends TestCase
         );
     }
 
-    abstract protected function initGatewayMock();
+    protected abstract function initGatewayMock();
 }

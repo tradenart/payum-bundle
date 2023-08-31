@@ -3,7 +3,7 @@
 Steps:
 
 * [Download libraries](#download-libraries)
-* [Configure payment](#configure-gateway)
+* [Configure payment](#configure-context)
 * [Prepare payment](#prepare-payment)
 
 _**Note**: We assume you followed all steps in [get it started](https://github.com/Payum/PayumBundle/blob/master/Resources/doc/get_it_started.md) and your basic configuration same as described there._
@@ -13,13 +13,13 @@ _**Note**: We assume you followed all steps in [get it started](https://github.c
 Run the following command:
 
 ```bash
-$ composer require "payum/be2bill"
+$ php composer.phar require "payum/be2bill"
 ```
 
 ## Configure gateway
 
 ```yaml
-#config/packages/payum.yml
+#app/config/config.yml
 
 payum:
     gateways:

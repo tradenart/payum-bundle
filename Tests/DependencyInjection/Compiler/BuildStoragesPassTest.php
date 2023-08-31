@@ -12,14 +12,14 @@ use Symfony\Component\DependencyInjection\Definition;
 
 class BuildStoragesPassTest extends \PHPUnit\Framework\TestCase
 {
-    public function testShouldImplementCompilerPassInterface(): void
+    public function testShouldImplementCompilerPassInterface()
     {
         $rc = new \ReflectionClass(BuildStoragesPass::class);
 
         $this->assertTrue($rc->implementsInterface(CompilerPassInterface::class));
     }
 
-    public function testShouldAddServiceWithTagToStaticRegistry(): void
+    public function testShouldAddServiceWithTagToStaticRegistry()
     {
         $service = new Definition();
         $service->addTag('payum.storage', ['model_class' => stdClass::class]);
@@ -37,10 +37,12 @@ class BuildStoragesPassTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['stdClass' => 'aservice'], $registry->getArgument(1));
     }
 
-    public function testThrowIfTagMissFactoryAttribute(): void
+    /**
+     * @expectedException \Payum\Core\Exception\LogicException
+     * @expectedExceptionMessage The payum.storage tag require model_class attribute.
+     */
+    public function testThrowIfTagMissFactoryAttribute()
     {
-        $this->expectException(\Payum\Core\Exception\LogicException::class);
-        $this->expectExceptionMessage("The payum.storage tag require model_class attribute.");
         $service = new Definition();
         $service->addTag('payum.storage');
 

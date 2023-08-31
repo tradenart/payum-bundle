@@ -11,14 +11,14 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class BuildGatewayFactoriesBuilderPassTest extends \PHPUnit\Framework\TestCase
 {
-    public function testShouldImplementCompilerPassInterface(): void
+    public function testShouldImplementCompilerPassInterface()
     {
         $rc = new \ReflectionClass(BuildGatewayFactoriesBuilderPass::class);
 
         $this->assertTrue($rc->implementsInterface(CompilerPassInterface::class));
     }
 
-    public function testShouldAddServiceWithTagToPayumBuilder(): void
+    public function testShouldAddServiceWithTagToPayumBuilder()
     {
         $service = new Definition();
         $service->addTag('payum.gateway_factory_builder', ['factory' => 'fooFactory']);
@@ -40,10 +40,12 @@ class BuildGatewayFactoriesBuilderPassTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('aservice', (string) $calls[0][1][1]);
     }
 
-    public function testThrowIfTagMissFactoryAttribute(): void
+    /**
+     * @expectedException \Payum\Core\Exception\LogicException
+     * @expectedExceptionMessage The payum.gateway_factory tag require factory attribute.
+     */
+    public function testThrowIfTagMissFactoryAttribute()
     {
-        $this->expectExceptionMessage("The payum.gateway_factory tag require factory attribute.");
-        $this->expectException(\Payum\Core\Exception\LogicException::class);
         $service = new Definition();
         $service->addTag('payum.gateway_factory_builder');
 

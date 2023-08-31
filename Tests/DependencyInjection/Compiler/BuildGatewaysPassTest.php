@@ -8,14 +8,14 @@ use Symfony\Component\DependencyInjection\Definition;
 
 class BuildGatewaysPassTest extends \PHPUnit\Framework\TestCase
 {
-    public function testShouldImplementCompilerPassInterface(): void
+    public function testShouldImplementCompilerPassInterface()
     {
         $rc = new \ReflectionClass(BuildGatewaysPass::class);
 
         $this->assertTrue($rc->implementsInterface(CompilerPassInterface::class));
     }
 
-    public function testShouldAddServiceWithTagToStaticRegistry(): void
+    public function testShouldAddServiceWithTagToStaticRegistry()
     {
         $service = new Definition();
         $service->addTag('payum.gateway', ['gateway' => 'foo']);
@@ -33,10 +33,12 @@ class BuildGatewaysPassTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['foo' => 'aservice'], $registry->getArgument(0));
     }
 
-    public function testThrowIfTagMissFactoryAttribute(): void
+    /**
+     * @expectedException \Payum\Core\Exception\LogicException
+     * @expectedExceptionMessage The payum.gateway tag require gateway attribute.
+     */
+    public function testThrowIfTagMissFactoryAttribute()
     {
-        $this->expectExceptionMessage("The payum.gateway tag require gateway attribute.");
-        $this->expectException(\Payum\Core\Exception\LogicException::class);
         $service = new Definition();
         $service->addTag('payum.gateway');
 

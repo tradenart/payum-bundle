@@ -30,15 +30,17 @@ class GatewayConfig extends BaseGatewayConfig
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
+     *
+     * @var integer $id
      */
-    protected int $id;
+    protected $id;
 }
 ```
 
 next, you have to add mapping of the basic entity you've just extended, and configure payum's extension:
 
 ```yml
-#config/packages/payum.yml
+#app/config/config.yml
 
 payum:
     dynamic_gateways:
@@ -62,15 +64,13 @@ Let's say you created a gateway with name `paypal`. Here we will show you how to
 
 namespace Acme\PaymentBundle\Controller;
 
-use Payum\Bundle\PayumBundle\Controller\PayumController;
-
-class PaymentController extends PayumController
+class PaymentController extends Controller 
 {
     public function prepareAction() 
     {
         $gatewayName = 'paypal';
         
-        $storage = $this->payum->getStorage('Acme\PaymentBundle\Entity\Payment');
+        $storage = $this->get('payum')->getStorage('Acme\PaymentBundle\Entity\Payment');
         
         $payment = $storage->create();
         $payment->setNumber(uniqid());
@@ -82,7 +82,7 @@ class PaymentController extends PayumController
         
         $storage->update($payment);
         
-        $captureToken = $this->payum->getTokenFactory()->createCaptureToken(
+        $captureToken = $this->get('payum')->getTokenFactory()->createCaptureToken(
             $gatewayName, 
             $payment, 
             'done' // the route to redirect after capture

@@ -3,13 +3,12 @@ namespace Payum\Bundle\PayumBundle\Controller;
 
 use Payum\Core\Reply\HttpPostRedirect;
 use Payum\Core\Request\Capture;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class CaptureController extends PayumController
 {
-    public function doSessionTokenAction(Request $request): RedirectResponse
+    public function doSessionTokenAction(Request $request)
     {
         if (false === $request->hasSession()) {
             throw new HttpException(400, 'This controller requires session to be started.');
@@ -35,15 +34,15 @@ class CaptureController extends PayumController
         return $this->redirect($redirectUrl);
     }
 
-    public function doAction(Request $request): RedirectResponse
+    public function doAction(Request $request)
     {
         $token = $this->getPayum()->getHttpRequestVerifier()->verify($request);
 
         $gateway = $this->getPayum()->getGateway($token->getGatewayName());
         $gateway->execute(new Capture($token));
-
+        
         $this->getPayum()->getHttpRequestVerifier()->invalidate($token);
-
+        
         return $this->redirect($token->getAfterUrl());
     }
 }

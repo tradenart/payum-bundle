@@ -8,8 +8,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class GatewayFactoriesChoiceTypeExtension extends AbstractTypeExtension
 {
-    private GatewayFactoryRegistryInterface $gatewayFactoryRegistry;
+    /**
+     * @var GatewayFactoryRegistryInterface
+     */
+    private $gatewayFactoryRegistry;
 
+    /**
+     * @param GatewayFactoryRegistryInterface $gatewayFactoryRegistry
+     */
     public function __construct(GatewayFactoryRegistryInterface $gatewayFactoryRegistry)
     {
         $this->gatewayFactoryRegistry = $gatewayFactoryRegistry;
@@ -18,7 +24,7 @@ class GatewayFactoriesChoiceTypeExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver): void
+    public function configureOptions(OptionsResolver $resolver)
     {
         $options = $resolver->getDefinedOptions();
         if (empty($options['choices'])) {
@@ -35,7 +41,10 @@ class GatewayFactoriesChoiceTypeExtension extends AbstractTypeExtension
         }
     }
 
-    public function getExtendedType(): string
+    /**
+     * {@inheritdoc}
+     */
+    public function getExtendedType()
     {
         return GatewayFactoriesChoiceType::class;
     }

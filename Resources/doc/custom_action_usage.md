@@ -16,12 +16,12 @@ There are several ways to add it to a gateway:
 * Set it explicitly in config.yml. 
 
     ```yaml
-    # config/packages/payum.yml
+    # app/config/config.yml
 
     payum:
         gateways:
             a_gateway:
-                factory: a_factory
+                factory: a_factory:
                 payum.action.foo: @payumActionServiceId
     ```
 
@@ -33,7 +33,7 @@ There are several ways to add it to a gateway:
     In this case the action will be added to all gateways created by requested factory.
  
     ```yaml
-    # config/packages/payum.yml
+    # app/config/config.yml
 
     payum:
         gateways:

@@ -9,7 +9,7 @@ class PayumBundleTest extends \PHPUnit\Framework\TestCase
     /**
      * @test
      */
-    public function shouldBeSubClassOfBundle(): void
+    public function shouldBeSubClassOfBundle()
     {
         $rc = new \ReflectionClass(PayumBundle::class);
 
@@ -19,9 +19,8 @@ class PayumBundleTest extends \PHPUnit\Framework\TestCase
     /**
      * @test
      */
-    public function couldBeConstructedWithoutAnyArguments(): void
+    public function couldBeConstructedWithoutAnyArguments()
     {
-        $this->expectNotToPerformAssertions();
         new PayumBundle;
     }
 } 

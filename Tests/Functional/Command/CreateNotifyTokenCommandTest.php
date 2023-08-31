@@ -14,24 +14,21 @@ class CreateNotifyTokenCommandTest extends WebTestCase
     /**
      * @test
      */
-    public function shouldCreateNotifyTokenWithoutModel(): void
+    public function shouldCreateNotifyTokenWithoutModel()
     {
-        /** @var RegistryInterface $payum */
-        $payum = $this->client->getContainer()->get('payum');
-
-        $output = $this->executeConsole(new CreateNotifyTokenCommand($payum), array(
+        $output = $this->executeConsole(new CreateNotifyTokenCommand, array(
             'gateway-name' => 'fooGateway'
         ));
 
-        $this->assertStringContainsString('Hash: ', $output);
-        $this->assertStringContainsString('Url: ', $output);
-        $this->assertStringContainsString('Details: null', $output);
+        $this->assertContains('Hash: ', $output);
+        $this->assertContains('Url: ', $output);
+        $this->assertContains('Details: null', $output);
     }
 
     /**
      * @test
      */
-    public function shouldCreateNotifyTokenWithModel(): void
+    public function shouldCreateNotifyTokenWithModel()
     {
         /** @var RegistryInterface $payum */
         $payum = $this->client->getContainer()->get('payum');
@@ -44,21 +41,24 @@ class CreateNotifyTokenCommandTest extends WebTestCase
 
         $modelId = $storage->identify($model)->getId();
 
-        $output = $this->executeConsole(new CreateNotifyTokenCommand($payum), array(
+        $output = $this->executeConsole(new CreateNotifyTokenCommand, array(
             'gateway-name' => 'fooGateway',
             '--model-class' => $modelClass,
             '--model-id' => $modelId
         ));
 
-        $this->assertStringContainsString('Hash: ', $output);
-        $this->assertStringContainsString('Url: ', $output);
-        $this->assertStringContainsString("Details: $modelClass#$modelId", $output);
+        $this->assertContains('Hash: ', $output);
+        $this->assertContains('Url: ', $output);
+        $this->assertContains("Details: $modelClass#$modelId", $output);
     }
 
     /**
+     * @param Command  $command
      * @param string[] $arguments
+     *
+     * @return string
      */
-    protected function executeConsole(Command $command, array $arguments = array()): string
+    protected function executeConsole(Command $command, array $arguments = array())
     {
         $command->setApplication(new Application($this->client->getKernel()));
         if ($command instanceof ContainerAwareInterface) {

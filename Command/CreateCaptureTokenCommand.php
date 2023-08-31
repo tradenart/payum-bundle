@@ -3,31 +3,24 @@ namespace Payum\Bundle\PayumBundle\Command;
 
 use Payum\Core\Exception\RuntimeException;
 use Payum\Core\Payum;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-#[AsCommand(name: 'payum:security:create-capture-token')]
-class CreateCaptureTokenCommand extends Command
+class CreateCaptureTokenCommand extends Command implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     protected static $defaultName = 'payum:security:create-capture-token';
-
-    private Payum $payum;
-
-    public function __construct(Payum $payum)
-    {
-        $this->payum = $payum;
-
-        parent::__construct();
-    }
 
     /**
      * {@inheritDoc}
      */
-    protected function configure(): void
+    protected function configure()
     {
         $this
             ->setName(static::$defaultName)
@@ -41,7 +34,7 @@ class CreateCaptureTokenCommand extends Command
     /**
      * {@inheritDoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $gatewayName = $input->getArgument('gateway-name');
         $modelClass = $input->getOption('model-class');
@@ -50,7 +43,7 @@ class CreateCaptureTokenCommand extends Command
 
         $model = null;
         if ($modelClass && $modelId) {
-            if (false === $model = $this->payum->getStorage($modelClass)->find($modelId)) {
+            if (false == $model = $this->getPayum()->getStorage($modelClass)->find($modelId)) {
                 throw new RuntimeException(sprintf(
                     'Cannot find model with class %s and id %s.',
                     $modelClass,
@@ -59,7 +52,7 @@ class CreateCaptureTokenCommand extends Command
             }
         }
 
-        $token = $this->payum->getTokenFactory()->createCaptureToken($gatewayName, $model, $afterUrl);
+        $token = $this->getPayum()->getTokenFactory()->createCaptureToken($gatewayName, $model, $afterUrl);
 
         $output->writeln(sprintf('Hash: <info>%s</info>', $token->getHash()));
         $output->writeln(sprintf('Url: <info>%s</info>', $token->getTargetUrl()));
@@ -67,5 +60,13 @@ class CreateCaptureTokenCommand extends Command
         $output->writeln(sprintf('Details: <info>%s</info>', (string) $token->getDetails()));
 
         return 0;
+    }
+
+    /**
+     * @return Payum
+     */
+    protected function getPayum()
+    {
+        return $this->container->get('payum');
     }
 }

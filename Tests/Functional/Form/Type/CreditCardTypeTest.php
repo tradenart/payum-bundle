@@ -7,36 +7,26 @@ use Payum\Core\Model\CreditCardInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Symfony\Component\HttpKernel\Kernel;
 
 class CreditCardTypeTest extends WebTestCase
 {
-    protected ?FormFactoryInterface $formFactory;
+    /**
+     * @var FormFactoryInterface
+     */
+    protected $formFactory;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->formFactory = static::getContainer()->get('form.factory');
+        $this->formFactory = static::$container->get('form.factory');
     }
 
     /**
      * @test
      */
-    public function couldBeCreatedByFormFactory(): void
+    public function couldBeCreatedByFormFactory()
     {
-        if (Kernel::MAJOR_VERSION === 6) {
-            /** @var RequestStack $requestStack */
-            $requestStack = self::getContainer()->get(RequestStack::class);
-            $request = Request::createFromGlobals();
-            $request->setSession(new Session(new MockArraySessionStorage()));
-            $requestStack->push($request);
-        }
-
         $form = $this->formFactory->create(CreditCardType::class);
         $view = $form->createView();
 
@@ -47,13 +37,13 @@ class CreditCardTypeTest extends WebTestCase
     /**
      * @test
      */
-    public function shouldSubmitDataCorrectly(): void
+    public function shouldSubmitDataCorrectly()
     {
         $form = $this->formFactory->create(CreditCardType::class, null, array(
             'csrf_protection' => false,
         ));
 
-        $year = (int) date('Y') + 2;
+        $year = date('Y') + 2;
 
         $form->submit(array(
             'holder' => 'John Doe',
@@ -82,7 +72,7 @@ class CreditCardTypeTest extends WebTestCase
     /**
      * @test
      */
-    public function shouldRequireHolderNotBlank(): void
+    public function shouldRequireHolderNotBlank()
     {
         $form = $this->formFactory->create(CreditCardType::class, null, array(
             'csrf_protection' => false,
@@ -106,7 +96,7 @@ class CreditCardTypeTest extends WebTestCase
     /**
      * @test
      */
-    public function shouldRequireNumberNotBlank(): void
+    public function shouldRequireNumberNotBlank()
     {
         $form = $this->formFactory->create(CreditCardType::class, null, array(
             'csrf_protection' => false,
@@ -130,7 +120,7 @@ class CreditCardTypeTest extends WebTestCase
     /**
      * @test
      */
-    public function shouldNumberPassLuchValidation(): void
+    public function shouldNumberPassLuchValidation()
     {
         $form = $this->formFactory->create(CreditCardType::class, null, array(
             'csrf_protection' => false,
@@ -154,7 +144,7 @@ class CreditCardTypeTest extends WebTestCase
     /**
      * @test
      */
-    public function shouldRequireSecurityCodeNotBlank(): void
+    public function shouldRequireSecurityCodeNotBlank()
     {
         $form = $this->formFactory->create(CreditCardType::class, null, array(
             'csrf_protection' => false,
@@ -178,7 +168,7 @@ class CreditCardTypeTest extends WebTestCase
     /**
      * @test
      */
-    public function shouldRequireExpireAtNotBlank(): void
+    public function shouldRequireExpireAtNotBlank()
     {
         $form = $this->formFactory->create(CreditCardType::class, null, array(
             'csrf_protection' => false,
@@ -202,7 +192,7 @@ class CreditCardTypeTest extends WebTestCase
     /**
      * @test
      */
-    public function shouldRequireExpireAtInFuture(): void
+    public function shouldRequireExpireAtInFuture()
     {
         $form = $this->formFactory->create(CreditCardType::class, null, array(
             'csrf_protection' => false,

@@ -7,19 +7,26 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 interface StorageFactoryInterface
 {
     /**
+     * @param ContainerBuilder $container
      * @param string $modelClass
+     * @param array $config
+     *
      * @return string The payment serviceId
      */
-    public function create(ContainerBuilder $container, $modelClass, array $config);
+    function create(ContainerBuilder $container, $modelClass, array $config);
 
     /**
-     * The storage name,
+     * The storage name, 
      * For example filesystem, doctrine, propel etc.
+     * 
+     * @return string
      */
-    public function getName();
+    function getName();
 
     /**
+     * @param ArrayNodeDefinition $builder
+     * 
      * @return void
      */
-    public function addConfiguration(ArrayNodeDefinition $builder);
+    function addConfiguration(ArrayNodeDefinition $builder);
 }

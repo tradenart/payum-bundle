@@ -14,7 +14,7 @@ class PayumExtensionTest extends TestCase
     /**
      * @test
      */
-    public function shouldBeSubClassOfExtension(): void
+    public function shouldBeSubClassOfExtension()
     {
         $rc = new \ReflectionClass(PayumExtension::class);
 
@@ -24,7 +24,7 @@ class PayumExtensionTest extends TestCase
     /**
      * @test
      */
-    public function shouldImplementPrependExtensionInterface(): void
+    public function shouldImplementPrependExtensionInterface()
     {
         $rc = new \ReflectionClass(PayumExtension::class);
 
@@ -34,45 +34,42 @@ class PayumExtensionTest extends TestCase
     /**
      * @test
      */
-    public function couldBeConstructedWithoutAnyArguments(): void
+    public function couldBeConstructedWithoutAnyArguments()
     {
-        $this->expectNotToPerformAssertions();
         new PayumExtension;
     }
 
     /**
      * @test
      */
-    public function shouldAllowAddStorageFactory(): void
+    public function shouldAllowAddStorageFactory()
     {
         $factory = $this->createMock(StorageFactoryInterface::class);
         $factory
+            ->expects($this->any())
             ->method('getName')
-            ->willReturn('theFoo')
+            ->will($this->returnValue('theFoo'))
         ;
 
         $extension = new PayumExtension;
         $extension->addStorageFactory($factory);
 
-        $reflectedConstraint = (new \ReflectionObject($extension))->getProperty('storagesFactories');
-        $reflectedConstraint->setAccessible(true);
-        $constraint = $reflectedConstraint->getValue($extension);
-
-        $this->assertEquals($factory, $constraint["theFoo"]);
+        $this->assertAttributeContains($factory, 'storagesFactories', $extension);
     }
 
     /**
      * @test
+     *
+     * @expectedException \Payum\Core\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The storage factory Mock_StorageFactoryInterface_
      */
-    public function throwIfTryToAddStorageFactoryWithEmptyName(): void
+    public function throwIfTryToAddStorageFactoryWithEmptyName()
     {
-        $this->expectExceptionMessage("The storage factory Mock_StorageFactoryInterface_");
-        $this->expectException(\Payum\Core\Exception\InvalidArgumentException::class);
         $factoryWithEmptyName = $this->createMock(StorageFactoryInterface::class);
         $factoryWithEmptyName
             ->expects($this->once())
             ->method('getName')
-            ->willReturn('')
+            ->will($this->returnValue(''))
         ;
 
         $extension = new PayumExtension;
@@ -81,16 +78,17 @@ class PayumExtensionTest extends TestCase
 
     /**
      * @test
+     *
+     * @expectedException \Payum\Core\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The storage factory with such name theFoo already registered
      */
-    public function throwIfTryToAddStorageGatewayFactoryWithNameAlreadyAdded(): void
+    public function throwIfTryToAddStorageGatewayFactoryWithNameAlreadyAdded()
     {
-        $this->expectExceptionMessage("The storage factory with such name theFoo already registered");
-        $this->expectException(\Payum\Core\Exception\InvalidArgumentException::class);
         $factory = $this->createMock(StorageFactoryInterface::class);
         $factory
             ->expects($this->atLeastOnce())
             ->method('getName')
-            ->willReturn('theFoo')
+            ->will($this->returnValue('theFoo'))
         ;
 
         $extension = new PayumExtension;
@@ -101,7 +99,7 @@ class PayumExtensionTest extends TestCase
     /**
      * @test
      */
-    public function shouldNotAddPayumMappingIfDoctrineBundleNotRegistered(): void
+    public function shouldNotAddPayumMappingIfDoctrineBundleNotRegistered()
     {
         $container = new ContainerBuilder;
         $container->setParameter('kernel.bundles', array());
@@ -116,7 +114,7 @@ class PayumExtensionTest extends TestCase
     /**
      * @test
      */
-    public function shouldNotAddPayumMappingIfDoctrineBundleRegisteredButDbalNotConfigured(): void
+    public function shouldNotAddPayumMappingIfDoctrineBundleRegisteredButDbalNotConfigured()
     {
         $extension = new PayumExtension;
 
@@ -139,7 +137,7 @@ class PayumExtensionTest extends TestCase
     /**
      * @test
      */
-    public function shouldNotAddPayumMappingIfDoctrineBundleRegisteredButOrmNotConfigured(): void
+    public function shouldNotAddPayumMappingIfDoctrineBundleRegisteredButOrmNotConfigured()
     {
         $extension = new PayumExtension;
 
@@ -162,7 +160,7 @@ class PayumExtensionTest extends TestCase
     /**
      * @test
      */
-    public function shouldAddPayumMappingIfDoctrineBundleRegisteredWithDbalAndOrmConfiguredInSingleConfiguration(): void
+    public function shouldAddPayumMappingIfDoctrineBundleRegisteredWithDbalAndOrmConfiguredInSingleConfiguration()
     {
         $extension = new PayumExtension;
 
@@ -203,7 +201,7 @@ class PayumExtensionTest extends TestCase
     /**
      * @test
      */
-    public function shouldAddPayumMappingIfDoctrineBundleRegisteredWithDbalAndOrmConfiguredInMultipleConfigurations(): void
+    public function shouldAddPayumMappingIfDoctrineBundleRegisteredWithDbalAndOrmConfiguredInMultipleConfigurations()
     {
         $extension = new PayumExtension;
 
@@ -248,7 +246,7 @@ class PayumExtensionTest extends TestCase
     /**
      * @test
      */
-    public function shouldAddGatewaysToBuilder(): void
+    public function shouldAddGatewaysToBuilder()
     {
         $extension = new PayumExtension;
         $extension->addStorageFactory(new FeeStorageFactory());
@@ -297,17 +295,17 @@ class PayumExtensionTest extends TestCase
 
 class FeeStorageFactory implements StorageFactoryInterface
 {
-    public function create(ContainerBuilder $container, $modelClass, array $config): string
+    public function create(ContainerBuilder $container, $modelClass, array $config)
     {
         return 'aStorageId';
     }
 
-    public function getName(): string
+    public function getName()
     {
         return 'bar_storage';
     }
 
-    public function addConfiguration(ArrayNodeDefinition $builder): void
+    public function addConfiguration(ArrayNodeDefinition $builder)
     {
         $builder
             ->children()

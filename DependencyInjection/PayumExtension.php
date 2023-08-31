@@ -11,7 +11,6 @@ use Payum\Core\Gateway;
 use Payum\Core\Registry\DynamicRegistry;
 use Payum\Core\Storage\CryptoStorageDecorator;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -31,12 +30,12 @@ class PayumExtension extends Extension implements PrependExtensionInterface
     /**
      * @var StorageFactoryInterface[]
      */
-    protected array $storagesFactories = array();
+    protected $storagesFactories = array();
 
     /**
      * {@inheritDoc}
      */
-    public function load(array $configs, ContainerBuilder $container): void
+    public function load(array $configs, ContainerBuilder $container)
     {
         $this->addStorageFactory(new FilesystemStorageFactory);
         $this->addStorageFactory(new DoctrineStorageFactory);
@@ -62,20 +61,20 @@ class PayumExtension extends Extension implements PrependExtensionInterface
         $this->loadStorages($config['storages'], $container);
         $this->loadSecurity($config['security'], $container);
 
-        $this->loadCoreGateway($config['gateways']['core'] ?? [], $container);
+        $this->loadCoreGateway(isset($config['gateways']['core']) ? $config['gateways']['core'] : [], $container);
         unset($config['gateways']['core']);
 
         $this->loadGateways($config['gateways'], $container);
 
         if (isset($config['dynamic_gateways'])) {
             $this->loadDynamicGateways($config['dynamic_gateways'], $container);
-        }
+        };
     }
 
     /**
      * {@inheritDoc}
      */
-    public function prepend(ContainerBuilder $container): void
+    public function prepend(ContainerBuilder $container)
     {
         $bundles = $container->getParameter('kernel.bundles');
 
@@ -103,7 +102,11 @@ class PayumExtension extends Extension implements PrependExtensionInterface
         }
     }
 
-    protected function loadGateways(array $config, ContainerBuilder $container): void
+    /**
+     * @param array $config
+     * @param ContainerBuilder $container
+     */
+    protected function loadGateways(array $config, ContainerBuilder $container)
     {
         $builder = $container->getDefinition('payum.builder');
 
@@ -112,7 +115,11 @@ class PayumExtension extends Extension implements PrependExtensionInterface
         }
     }
 
-    protected function loadCoreGateway(array $config, ContainerBuilder $container): void
+    /**
+     * @param array $config
+     * @param ContainerBuilder $container
+     */
+    protected function loadCoreGateway(array $config, ContainerBuilder $container)
     {
         $builder = $container->getDefinition('payum.builder');
 
@@ -132,7 +139,11 @@ class PayumExtension extends Extension implements PrependExtensionInterface
         $builder->addMethodCall('addCoreGatewayFactoryConfig', [$config]);
     }
 
-    protected function loadStorages(array $config, ContainerBuilder $container): void
+    /**
+     * @param array $config
+     * @param ContainerBuilder $container
+     */
+    protected function loadStorages(array $config, ContainerBuilder $container)
     {
         foreach ($config as $modelClass => $storageConfig) {
             $storageFactoryName = $this->findSelectedStorageFactoryNameInStorageConfig($storageConfig);
@@ -144,7 +155,7 @@ class PayumExtension extends Extension implements PrependExtensionInterface
 
             $container->getDefinition($storageId)->addTag('payum.storage', array('model_class' => $modelClass));
 
-            if (str_contains($storageId, '.storage.')) {
+            if (false !== strpos($storageId, '.storage.')) {
                 $storageExtensionId = str_replace('.storage.', '.extension.storage.', $storageId);
             } else {
                 throw new LogicException(sprintf('In order to add storage to extension the storage "%s" has to contains ".storage." inside.', $storageId));
@@ -169,7 +180,11 @@ class PayumExtension extends Extension implements PrependExtensionInterface
         }
     }
 
-    protected function loadSecurity(array $securityConfig, ContainerBuilder $container): void
+    /**
+     * @param array $securityConfig
+     * @param ContainerBuilder $container
+     */
+    protected function loadSecurity(array $securityConfig, ContainerBuilder $container)
     {
         foreach ($securityConfig['token_storage'] as $tokenClass => $tokenStorageConfig) {
             $storageFactoryName = $this->findSelectedStorageFactoryNameInStorageConfig($tokenStorageConfig);
@@ -184,7 +199,11 @@ class PayumExtension extends Extension implements PrependExtensionInterface
         }
     }
 
-    protected function loadDynamicGateways(array $dynamicGatewaysConfig, ContainerBuilder $container): void
+    /**
+     * @param array $dynamicGatewaysConfig
+     * @param ContainerBuilder $container
+     */
+    protected function loadDynamicGateways(array $dynamicGatewaysConfig, ContainerBuilder $container)
     {
         $configClass = null;
         $configStorage = null;
@@ -216,7 +235,7 @@ class PayumExtension extends Extension implements PrependExtensionInterface
         }
 
         //deprecated
-        $registry = new Definition(DynamicRegistry::class, array(
+        $registry =  new Definition(DynamicRegistry::class, array(
             new Reference('payum.dynamic_gateways.config_storage'),
             new Reference('payum.static_registry')
         ));
@@ -225,7 +244,8 @@ class PayumExtension extends Extension implements PrependExtensionInterface
         $container->setDefinition('payum.dynamic_registry', $registry);
 
         if ($dynamicGatewaysConfig['sonata_admin']) {
-            if (false === class_exists(AbstractAdmin::class)) {
+
+            if (false == class_exists(AbstractAdmin::class)) {
                 throw new LogicException('Admin class does not exists. Did you install SonataAdmin bundle?');
             }
 
@@ -254,9 +274,11 @@ class PayumExtension extends Extension implements PrependExtensionInterface
     }
 
     /**
+     * @param Factory\Storage\StorageFactoryInterface $factory
+     *
      * @throws \Payum\Core\Exception\InvalidArgumentException
      */
-    public function addStorageFactory(StorageFactoryInterface $factory): void
+    public function addStorageFactory(StorageFactoryInterface $factory)
     {
         $factoryName = $factory->getName();
         if (empty($factoryName)) {
@@ -272,19 +294,22 @@ class PayumExtension extends Extension implements PrependExtensionInterface
     /**
      * {@inheritDoc}
      */
-    public function getConfiguration(array $config, ContainerBuilder $container): MainConfiguration
+    public function getConfiguration(array $config, ContainerBuilder $container)
     {
         return new MainConfiguration($this->storagesFactories);
     }
 
-    protected function findSelectedStorageFactoryNameInStorageConfig(array $storageConfig): string
+    /**
+     * @param array $storageConfig
+     *
+     * @return string
+     */
+    protected function findSelectedStorageFactoryNameInStorageConfig($storageConfig)
     {
         foreach ($storageConfig as $name => $value) {
             if (isset($this->storagesFactories[$name])) {
                 return $name;
             }
         }
-
-        throw new \RuntimeException('StorageFactoryName not found');
     }
 }

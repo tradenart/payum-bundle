@@ -37,15 +37,17 @@ class PaymentDetails extends ArrayObject
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
+     *
+     * @var integer $id
      */
-    protected int $id;
+    protected $id;
 }
 ```
 
 next, you have to add mapping of the basic entities you are extended, and configure payum's storages:
 
 ```yml
-# config/packages/payum.yml
+# app/config/config.yml
 
 payum:
     security:
@@ -62,7 +64,7 @@ Token use custom mongo type called `ObjectType`, so you have to add it to the ke
 
 ```php
 <?php
-// src/Kernel.php
+// app\AppKernel.php
 
 use Doctrine\ODM\MongoDB\Types\Type;
 
@@ -107,15 +109,17 @@ class PaymentDetails extends ArrayObject
 {
     /**
      * @Mongo\Id
+     *
+     * @var integer $id
      */
-    protected int $id;
+    protected $id;
 }
 ```
 
 next, you have to add mapping of the basic entities you are extended, and configure payum's storages:
 
 ```yml
-# config/packages/payum.yml
+# app/config/config.yml
 
 doctrine_mongodb:
     document_managers:
@@ -215,7 +219,7 @@ class CustomStorage implements StorageInterface
 Register it as a service:
 
 ```yaml
-# config/packages/payum.yml
+# app/config/config.yml
 
 services:
     acme.payment.payum.storage.custom:
@@ -226,7 +230,7 @@ When you are done you can use it like this:
 
 
 ```yaml
-# config/packages/payum.yml
+# app/config/config.yml
 
 payum:
     storages:
@@ -259,14 +263,14 @@ use Payum\Core\Model\ArrayObject;
 
 class PaymentDetails extends ArrayObject
 {
-    protected int $id;
+    protected $id;
 }
 ```
 
 next, you have to configure payum's storages:
 
 ```yaml
-# config/packages/payum.yml
+# app/config/config.yml
 
 payum:
     security:

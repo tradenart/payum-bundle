@@ -16,7 +16,7 @@ class GatewayConfigAdminTest extends TestCase
     /**
      * @test
      */
-    public function shouldBeSubClassSonataAdmin(): void
+    public function shouldBeSubClassSonataAdmin()
     {
         $rc = new \ReflectionClass(GatewayConfigAdmin::class);
 
@@ -26,7 +26,7 @@ class GatewayConfigAdminTest extends TestCase
     /**
      * @test
      */
-    public function couldBeConstructedWithExpectedArguments(): void
+    public function couldBeConstructedWithExpectedArguments()
     {
         new GatewayConfigAdmin('code', 'class', 'baseControllerName');
     }
@@ -34,7 +34,7 @@ class GatewayConfigAdminTest extends TestCase
     /**
      * @test
      */
-    public function shouldAllowSetFormFactory(): void
+    public function shouldAllowSetFormFactory()
     {
         $admin = new GatewayConfigAdmin('code', 'class', 'baseControllerName');
 

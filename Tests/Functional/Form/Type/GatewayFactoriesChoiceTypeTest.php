@@ -9,19 +9,22 @@ use Symfony\Component\Form\FormView;
 
 class GatewayFactoriesChoiceTypeTest extends WebTestCase
 {
-    protected ?FormFactoryInterface $formFactory;
+    /**
+     * @var FormFactoryInterface
+     */
+    protected $formFactory;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->formFactory = static::getContainer()->get('form.factory');
+        $this->formFactory = static::$container->get('form.factory');
     }
 
     /**
      * @test
      */
-    public function couldBeCreatedByFormFactory(): void
+    public function couldBeCreatedByFormFactory()
     {
         $form = $this->formFactory->create(GatewayFactoriesChoiceType::class);
         $view = $form->createView();

@@ -1,22 +1,29 @@
 <?php
+
 namespace Payum\Bundle\PayumBundle\DependencyInjection\Factory\Storage;
+
 
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Config\FileLocator;
 
-class Propel1StorageFactory extends AbstractStorageFactory
+
+class Propel1StorageFactory  extends AbstractStorageFactory
 {
+    
     /**
      * {@inheritDoc}
      */
-    public function getName(): string
+    public function getName()
     {
         return "propel1";
     }
-
-    protected function createStorage(ContainerBuilder $container, string $modelClass, array $config): ChildDefinition
+        
+    /**
+     * {@inheritDoc}
+     */
+    protected function createStorage(ContainerBuilder $container, $modelClass, array $config)
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../../../Resources/config/storage'));
         $loader->load('propel1.xml');

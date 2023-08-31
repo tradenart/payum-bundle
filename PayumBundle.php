@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class PayumBundle extends Bundle
 {
-    public function build(ContainerBuilder $container): void
+    public function build(ContainerBuilder $container)
     {
         parent::build($container);
 

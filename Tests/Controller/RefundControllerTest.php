@@ -15,7 +15,7 @@ class RefundControllerTest extends AbstractControllerTest
     /**
      * @test
      */
-    public function shouldBeSubClassOfController(): void
+    public function shouldBeSubClassOfController()
     {
         $rc = new \ReflectionClass(RefundController::class);
 
@@ -25,9 +25,10 @@ class RefundControllerTest extends AbstractControllerTest
     /**
      * @test
      */
-    public function shouldExecuteRefundRequest(): void
+    public function shouldExecuteRefundRequest()
     {
-        $controller = new RefundController($this->payum);
+        $controller = new RefundController();
+        $controller->setContainer(new ServiceLocator(['payum' => function () { return $this->payum; }]));
 
         $response = $controller->doAction($this->request);
 
@@ -38,11 +39,12 @@ class RefundControllerTest extends AbstractControllerTest
     /**
      * @test
      */
-    public function shouldExecuteRefundRequestWithoutAfterUrl(): void
+    public function shouldExecuteRefundRequestWithoutAfterUrl()
     {
         $this->token->setAfterUrl(null);
 
-        $controller = new RefundController($this->payum);
+        $controller = new RefundController();
+        $controller->setContainer(new ServiceLocator(['payum' => function () { return $this->payum; }]));
 
         $response = $controller->doAction($this->request);
 
@@ -50,12 +52,13 @@ class RefundControllerTest extends AbstractControllerTest
         $this->assertEquals(204, $response->getStatusCode());
     }
 
-    protected function initGatewayMock(): void
+    protected function initGatewayMock()
     {
         $this->gatewayMock = $this->createMock(GatewayInterface::class);
         $this->gatewayMock
+            ->expects($this->any())
             ->method('execute')
-            ->with($this->isInstanceOf(Refund::class))
-        ;
+            ->with($this->isInstanceOf(Refund::class));
+
     }
 }

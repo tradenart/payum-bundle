@@ -3,7 +3,6 @@ namespace Payum\Bundle\PayumBundle\Tests\DependencyInjection\Factory;
 
 use Payum\Bundle\PayumBundle\DependencyInjection\Factory\Storage\AbstractStorageFactory;
 use Payum\Bundle\PayumBundle\DependencyInjection\Factory\Storage\StorageFactoryInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -14,17 +13,17 @@ class AbstractStorageFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @test
      */
-    public function shouldImplementStorageFactoryInterface(): void
+    public function shouldImplementStorageFactoryInterface()
     {
-        $rc = new \ReflectionClass(AbstractStorageFactory::class);
-
+        $rc = new \ReflectionClass('Payum\Bundle\PayumBundle\DependencyInjection\Factory\Storage\AbstractStorageFactory');
+        
         $this->assertTrue($rc->implementsInterface(StorageFactoryInterface::class));
     }
 
     /**
      * @test
      */
-    public function shouldBeAbstract(): void
+    public function shouldBeAbstract()
     {
         $rc = new \ReflectionClass(StorageFactoryInterface::class);
 
@@ -34,15 +33,13 @@ class AbstractStorageFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @test
      */
-    public function shouldAllowAddConfiguration(): void
+    public function shouldAllowAddConfiguration()
     {
-        $this->expectNotToPerformAssertions();
-
         $factory = $this->createAbstractStorageFactory();
 
         $tb = new TreeBuilder('foo');
         $rootNode = $tb->getRootNode();
-
+        
         $factory->addConfiguration($rootNode);
 
         $processor = new Processor();
@@ -52,17 +49,17 @@ class AbstractStorageFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @test
      */
-    public function shouldAllowCreateStorageAndReturnItsId(): void
+    public function shouldAllowCreateStorageAndReturnItsId()
     {
         $expectedStorage = new Definition();
-
+        
         $factory = $this->createAbstractStorageFactory();
         $factory
             ->expects($this->once())
             ->method('createStorage')
-            ->willReturnCallback(function () use ($expectedStorage) {
+            ->will($this->returnCallback(function() use ($expectedStorage) {
                 return $expectedStorage;
-            })
+            }))
         ;
 
         $container = new ContainerBuilder;
@@ -74,10 +71,10 @@ class AbstractStorageFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedStorage, $container->getDefinition($actualStorageId));
     }
 
-    protected function assertDefinitionContainsMethodCall(Definition $serviceDefinition, $expectedMethod, $expectedFirstArgument): void
+    protected function assertDefinitionContainsMethodCall(Definition $serviceDefinition, $expectedMethod, $expectedFirstArgument)
     {
         foreach ($serviceDefinition->getMethodCalls() as $methodCall) {
-            if ($expectedMethod === $methodCall[0] && $expectedFirstArgument === $methodCall[1][0]) {
+            if ($expectedMethod == $methodCall[0] && $expectedFirstArgument == $methodCall[1][0]) {
                 return;
             }
         }
@@ -91,10 +88,10 @@ class AbstractStorageFactoryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return AbstractStorageFactory|MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject|AbstractStorageFactory
      */
     protected function createAbstractStorageFactory()
     {
-        return $this->getMockForAbstractClass(AbstractStorageFactory::class);
+        return $this->getMockForAbstractClass('Payum\Bundle\PayumBundle\DependencyInjection\Factory\Storage\AbstractStorageFactory');
     }
 }

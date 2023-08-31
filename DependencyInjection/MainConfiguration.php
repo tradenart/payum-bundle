@@ -6,15 +6,13 @@ use Payum\Core\Exception\LogicException;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
-use Payum\Core\Model\GatewayConfigInterface;
-use Payum\Core\Security\TokenInterface;
 
 class MainConfiguration implements ConfigurationInterface
 {
     /**
      * @var StorageFactoryInterface[]
      */
-    protected array $storageFactories = array();
+    protected $storageFactories = array();
 
     /**
      * @param StorageFactoryInterface[] $storageFactories
@@ -29,7 +27,7 @@ class MainConfiguration implements ConfigurationInterface
     /**
      * {@inheritDoc}
      */
-    public function getConfigTreeBuilder(): TreeBuilder
+    public function getConfigTreeBuilder()
     {
         $tb = new TreeBuilder('payum');
         $rootNode = $tb->getRootNode();
@@ -57,7 +55,10 @@ class MainConfiguration implements ConfigurationInterface
         return $tb;
     }
 
-    protected function addStoragesSection(ArrayNodeDefinition $rootPrototypeNode): void
+    /**
+     * @param ArrayNodeDefinition $rootPrototypeNode
+     */
+    protected function addStoragesSection(ArrayNodeDefinition $rootPrototypeNode)
     {
         $storageNode = $rootPrototypeNode->children()
                 ->arrayNode('storages')
@@ -67,7 +68,7 @@ class MainConfiguration implements ConfigurationInterface
                         unset($storages['extension']);
 
                         foreach($storages as $key => $value) {
-                            if (false === class_exists($key)) {
+                            if (false == class_exists($key)) {
                                 throw new LogicException(sprintf(
                                     'The storage entry must be a valid model class. It is set %s',
                                     $key
@@ -89,7 +90,7 @@ class MainConfiguration implements ConfigurationInterface
                     $storages = $v;
                     unset($storages['extension']);
 
-                    if (count($storages) === 0) {
+                    if (count($storages) == 0) {
                         throw new LogicException('At least one storage must be configured.');
                     }
                     if (count($storages) > 1) {
@@ -126,7 +127,10 @@ class MainConfiguration implements ConfigurationInterface
         }
     }
 
-    protected function addSecuritySection(ArrayNodeDefinition $securityNode): void
+    /**
+     * @param ArrayNodeDefinition $securityNode
+     */
+    protected function addSecuritySection(ArrayNodeDefinition $securityNode)
     {
         $storageNode = $securityNode->children()
             ->arrayNode('token_storage')
@@ -134,7 +138,7 @@ class MainConfiguration implements ConfigurationInterface
             ->validate()
             ->ifTrue(function($v) {
                 foreach($v as $key => $value) {
-                    if (false === class_exists($key)) {
+                    if (false == class_exists($key)) {
                         throw new LogicException(sprintf(
                             'The storage entry must be a valid model class. It is set %s',
                             $key
@@ -142,7 +146,7 @@ class MainConfiguration implements ConfigurationInterface
                     }
 
                     $rc = new \ReflectionClass($key);
-                    if (false === $rc->implementsInterface(TokenInterface::class)) {
+                    if (false == $rc->implementsInterface('Payum\Core\Security\TokenInterface')) {
                         throw new LogicException('The token class must implement `Payum\Core\Security\TokenInterface` interface');
                     }
 
@@ -162,7 +166,7 @@ class MainConfiguration implements ConfigurationInterface
         $storageNode
             ->validate()
             ->ifTrue(function($v) {
-                if (count($v) === 0) {
+                if (count($v) == 0) {
                     throw new LogicException('At least one storage must be configured.');
                 }
                 if (count($v) > 1) {
@@ -182,7 +186,10 @@ class MainConfiguration implements ConfigurationInterface
         }
     }
 
-    protected function addDynamicGatewaysSection(ArrayNodeDefinition $dynamicGatewaysNode): void
+    /**
+     * @param ArrayNodeDefinition $dynamicGatewaysNode
+     */
+    protected function addDynamicGatewaysSection(ArrayNodeDefinition $dynamicGatewaysNode)
     {
         $dynamicGatewaysNode->children()
             ->booleanNode('sonata_admin')->defaultFalse()
@@ -194,7 +201,7 @@ class MainConfiguration implements ConfigurationInterface
             ->validate()
             ->ifTrue(function($v) {
                 foreach($v as $key => $value) {
-                    if (false === class_exists($key)) {
+                    if (false == class_exists($key)) {
                         throw new LogicException(sprintf(
                             'The storage entry must be a valid model class. It is set %s',
                             $key
@@ -202,7 +209,7 @@ class MainConfiguration implements ConfigurationInterface
                     }
 
                     $rc = new \ReflectionClass($key);
-                    if (false === $rc->implementsInterface(GatewayConfigInterface::class)) {
+                    if (false == $rc->implementsInterface('Payum\Core\Model\GatewayConfigInterface')) {
                         throw new LogicException('The config class must implement `Payum\Core\Model\GatewayConfigInterface` interface');
                     }
 
@@ -222,7 +229,7 @@ class MainConfiguration implements ConfigurationInterface
         $storageNode
             ->validate()
             ->ifTrue(function($v) {
-                if (count($v) === 0) {
+                if (count($v) == 0) {
                     throw new LogicException('At least one storage must be configured.');
                 }
                 if (count($v) > 1) {

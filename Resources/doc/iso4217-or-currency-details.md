@@ -7,7 +7,7 @@ To get this information you have to execute a GetCurrency request with a currenc
 ```php
 <?php
 
-$gateway = $this->payum->getGatewayFactory('offline')->create();
+$gateway = $container->get('payum')->getGatewayFactory('offline')->create();
 
 $gateway->execute($currency = new \Payum\Core\GetCurrency('USD'));
 
@@ -38,7 +38,7 @@ Or directly ISO4217 service:
 ```php
 <?php
 
-/** @var \Alcohol\ISO4216\ISO4217 $iso4217
+/** @var \Payum\ISO4216\ISO4217 $iso4217
 $iso4217 = $container->get('payum.iso4217');
 
 /** @var \Payum\ISO4216\Currency $currency **/
@@ -52,11 +52,11 @@ echo $currency->getCountry(); // US
 
 ## Next 
 
-* [The architecture](https://github.com/Payum/Payum/blob/master/docs/the-architecture.md).
-* [Supported gateways](https://github.com/Payum/Payum/blob/master/docs/supported-gateways.md).
+* [The architecture](the-architecture.md).
+* [Supported gateways](supported-gateways.md).
 * [Storages](storages.md).
-* [Capture script](get-it-started.md).
-* [Authorize](authorize.md).
-* [Done script](purchase_done_action.md).
+* [Capture script](capture-script.md).
+* [Authorize script](authorize-script.md).
+* [Done script](done-script.md).
 
 Back to [index](index.md).

@@ -13,15 +13,13 @@ We have to caThe only difference from capture one example
 
 namespace Acme\PaymentBundle\Controller;
 
-use Payum\Bundle\PayumBundle\Controller\PayumController;
-
-class PaymentController extends PayumController
+class PaymentController extends Controller 
 {
     public function prepareAction() 
     {
         $gatewayName = 'offline';
         
-        $storage = $this->payum->getStorage('Acme\PaymentBundle\Entity\Payment');
+        $storage = $this->get('payum')->getStorage('Acme\PaymentBundle\Entity\Payment');
         
         $payment = $storage->create();
         $payment->setNumber(uniqid());
@@ -33,7 +31,7 @@ class PaymentController extends PayumController
         
         $storage->update($payment);
         
-        $captureToken = $this->payum->getTokenFactory()->createCaptureToken(
+        $captureToken = $this->get('payum')->getTokenFactory()->createCaptureToken(
             $gatewayName, 
             $payment, 
             'done' // the route to redirect after capture;

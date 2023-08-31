@@ -6,9 +6,6 @@ use Payum\Bundle\PayumBundle\Controller\NotifyController;
 use Payum\Core\GatewayInterface;
 use Payum\Core\Payum;
 use Payum\Core\Request\Notify;
-use Payum\Core\Security\GenericTokenFactoryInterface;
-use Payum\Core\Security\HttpRequestVerifierInterface;
-use Payum\Core\Storage\StorageInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -20,7 +17,7 @@ class NotifyControllerTest extends TestCase
     /**
      * @test
      */
-    public function shouldBeSubClassOfController(): void
+    public function shouldBeSubClassOfController()
     {
         $rc = new \ReflectionClass(NotifyController::class);
 
@@ -30,34 +27,26 @@ class NotifyControllerTest extends TestCase
     /**
      * @test
      */
-    public function shouldExecuteNotifyRequestOnDoUnsafe(): void
+    public function shouldExecuteNotifyRequestOnDoUnsafe()
     {
         $request = Request::create('/');
         $request->query->set('gateway', 'theGatewayName');
 
         $gatewayMock = $this->createMock(GatewayInterface::class);
         $gatewayMock
+            ->expects($this->any())
             ->method('execute')
             ->with($this->isInstanceOf(Notify::class));
 
         $registryMock = $this->createMock(Payum::class);
         $registryMock
+            ->expects($this->any())
             ->method('getGateway')
             ->with('theGatewayName')
-            ->willReturn($gatewayMock);
+            ->will($this->returnValue($gatewayMock));
 
-        $this->httpRequestVerifierMock = $this->createMock(
-            HttpRequestVerifierInterface::class
-        );
-
-        $this->payum = new Payum(
-            $registryMock,
-            $this->httpRequestVerifierMock,
-            $this->createMock(GenericTokenFactoryInterface::class),
-            $this->createMock(StorageInterface::class)
-        );
-
-        $controller = new NotifyController($this->payum);
+        $controller = new NotifyController();
+        $controller->setContainer(new ServiceLocator(['payum' => function () use ($registryMock) { return $registryMock; }]));
 
         $response = $controller->doUnsafeAction($request);
 

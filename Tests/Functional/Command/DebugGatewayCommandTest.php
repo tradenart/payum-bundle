@@ -3,7 +3,6 @@ namespace Payum\Bundle\PayumBundle\Tests\Functional\Command;
 
 use Payum\Bundle\PayumBundle\Command\DebugGatewayCommand;
 use Payum\Bundle\PayumBundle\Tests\Functional\WebTestCase;
-use Payum\Core\Registry\RegistryInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -14,83 +13,78 @@ class DebugGatewayCommandTest extends WebTestCase
     /**
      * @test
      */
-    public function shouldOutputDebugInfoAboutSingleGateway(): void
+    public function shouldOutputDebugInfoAboutSingleGateway()
     {
-        /** @var RegistryInterface $payum */
-        $payum = $this->client->getContainer()->get('payum');
-
-        $output = $this->executeConsole(new DebugGatewayCommand($payum), array(
+        $output = $this->executeConsole(new DebugGatewayCommand(), array(
             'gateway-name' => 'fooGateway',
         ));
 
-        $this->assertStringContainsString('Found 1 gateways', $output);
-        $this->assertStringContainsString('fooGateway (Payum\Core\Gateway):', $output);
-        $this->assertStringContainsString('Actions:', $output);
-        $this->assertStringContainsString('Extensions:', $output);
-        $this->assertStringContainsString('Apis:', $output);
+        $this->assertContains('Found 1 gateways', $output);
+        $this->assertContains('fooGateway (Payum\Core\Gateway):', $output);
+        $this->assertContains('Actions:', $output);
+        $this->assertContains('Extensions:', $output);
+        $this->assertContains('Apis:', $output);
 
-        $this->assertStringContainsString('Payum\Offline\Action\CaptureAction', $output);
+        $this->assertContains('Payum\Offline\Action\CaptureAction', $output);
 
-        $this->assertStringContainsString('Payum\Core\Extension\StorageExtension', $output);
-        $this->assertStringContainsString('Payum\Core\Storage\FilesystemStorage', $output);
-        $this->assertStringContainsString('Payum\Core\Model\ArrayObject', $output);
+        $this->assertContains('Payum\Core\Extension\StorageExtension', $output);
+        $this->assertContains('Payum\Core\Storage\FilesystemStorage', $output);
+        $this->assertContains('Payum\Core\Model\ArrayObject', $output);
     }
 
     /**
      * @test
      */
-    public function shouldOutputDebugInfoAboutAllGateways(): void
+    public function shouldOutputDebugInfoAboutAllGateways()
     {
-        /** @var RegistryInterface $payum */
-        $payum = $this->client->getContainer()->get('payum');
+        $output = $this->executeConsole(new DebugGatewayCommand());
 
-        $output = $this->executeConsole(new DebugGatewayCommand($payum));
-
-        $this->assertStringContainsString('Found 2 gateways', $output);
-        $this->assertStringContainsString('fooGateway (Payum\Core\Gateway):', $output);
-        $this->assertStringContainsString('barGateway (Payum\Core\Gateway):', $output);
+        $this->assertContains('Found 2 gateways', $output);
+        $this->assertContains('fooGateway (Payum\Core\Gateway):', $output);
+        $this->assertContains('barGateway (Payum\Core\Gateway):', $output);
     }
 
     /**
      * @test
      */
-    public function shouldOutputInfoWhatActionsSupports(): void
+    public function shouldOutputInfoWhatActionsSupports()
     {
-        /** @var RegistryInterface $payum */
-        $payum = $this->client->getContainer()->get('payum');
-
-        $output = $this->executeConsole(new DebugGatewayCommand($payum), array(
+        $output = $this->executeConsole(new DebugGatewayCommand(), array(
             'gateway-name' => 'fooGateway',
             '--show-supports' => true,
         ));
 
-        $this->assertStringContainsString('Found 1 gateways', $output);
-        $this->assertStringContainsString('fooGateway (Payum\Core\Gateway):', $output);
-        $this->assertStringContainsString('Payum\Offline\Action\CaptureAction', $output);
-        $this->assertStringContainsString('$request instanceof Capture &&', $output);
-        $this->assertStringContainsString('$request->getModel() instanceof PaymentInterface', $output);
+        $this->assertContains('Found 1 gateways', $output);
+        $this->assertContains('fooGateway (Payum\Core\Gateway):', $output);
+        $this->assertContains('Payum\Offline\Action\CaptureAction', $output);
+        $this->assertContains('$request instanceof Capture &&', $output);
+        $this->assertContains('$request->getModel() instanceof PaymentInterface', $output);
     }
 
     /**
      * @test
      */
-    public function shouldOutputChoiceListGatewaysForNameGiven(): void
+    public function shouldOutputChoiceListGatewaysForNameGiven()
     {
-        /** @var RegistryInterface $payum */
-        $payum = $this->client->getContainer()->get('payum');
-
-        $command = new DebugGatewayCommand($payum);
+        $command = new DebugGatewayCommand();
         $command->setApplication(new Application($this->client->getKernel()));
 
         $output = $this->executeConsole($command, [
             'gateway-name' => 'foo',
         ], ['0']);
 
-        $this->assertStringContainsString('Choose a number for more information on the payum gateway', $output);
-        $this->assertStringContainsString('[0] fooGateway', $output);
+        $this->assertContains('Choose a number for more information on the payum gateway', $output);
+        $this->assertContains('[0] fooGateway', $output);
     }
 
-    protected function executeConsole(Command $command, array $arguments = [], array $inputs = []): string
+    /**
+     * @param Command $command
+     * @param string[] $arguments
+     * @param string[] $inputs
+     *
+     * @return string
+     */
+    protected function executeConsole(Command $command, array $arguments = [], array $inputs = [])
     {
         if (!$command->getApplication()) {
             $command->setApplication(new Application($this->client->getKernel()));
@@ -116,7 +110,7 @@ class DebugGatewayCommandTest extends WebTestCase
     protected function getInputStream($input)
     {
         $stream = fopen('php://memory', 'r+', false);
-        fwrite($stream, $input);
+        fputs($stream, $input);
         rewind($stream);
 
         return $stream;

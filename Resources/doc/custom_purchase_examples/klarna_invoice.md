@@ -3,7 +3,7 @@
 Steps:
 
 * [Download libraries](#download-libraries)
-* [Configure gateway](#configure-gateway)
+* [Configure gateway](#configure-context)
 * [Prepare payment](#prepare-payment)
 
 _**Note**: We assume you followed all steps in [get it started](https://github.com/Payum/PayumBundle/blob/master/Resources/doc/get_it_started.md) and your basic configuration same as described there._
@@ -13,13 +13,13 @@ _**Note**: We assume you followed all steps in [get it started](https://github.c
 Run the following command:
 
 ```bash
-$ composer require "payum/klarna-invoice:@stable"
+$ php composer.phar require "payum/klarna-invoice:@stable"
 ```
 
 ## Configure gateway
 
 ```yaml
-#config/packages/payum.yml
+#app/config/config.yml
 
 payum:
     gateways:
@@ -58,7 +58,7 @@ class PaymentController extends Controller
 
         $details = $storage->create();
         $details = array(
-            /** @link https://developers.klarna.com/en/testing/invoice-and-account */
+            /** @link http://developers.klarna.com/en/testing/invoice-and-account */
             'pno' => '410321-9202',
             'amount' => -1,
             'gender' => \KlarnaFlags::MALE,

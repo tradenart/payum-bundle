@@ -13,97 +13,93 @@ use Payum\Stripe\StripeJsGatewayFactory;
 
 class PayumTest extends WebTestCase
 {
-    public function testCouldBeGetFromContainerAsService(): void
+    public function testCouldBeGetFromContainerAsService()
     {
         /** @var Payum $payum */
-        $payum = static::getContainer()->get('payum');
+        $payum = static::$container->get('payum');
 
         $this->assertInstanceOf(Payum::class, $payum);
     }
 
-    public function testShouldReturnHttpRequestVerifyRequest(): void
+    public function testShouldReturnHttpRequestVerifyRequest()
     {
         /** @var Payum $payum */
-        $payum = static::getContainer()->get('payum');
+        $payum = static::$container->get('payum');
 
         $this->assertInstanceOf(HttpRequestVerifier::class, $payum->getHttpRequestVerifier());
     }
 
-    public function testShouldReturnTokenFactory(): void
+    public function testShouldReturnTokenFactory()
     {
         /** @var Payum $payum */
-        $payum = static::getContainer()->get('payum');
+        $payum = static::$container->get('payum');
 
         $tokenFactory = $payum->getTokenFactory();
         $this->assertInstanceOf(GenericTokenFactory::class, $tokenFactory);
-
-        $reflectedConstraint = (new \ReflectionObject($tokenFactory))->getProperty('tokenFactory');
-        $reflectedConstraint->setAccessible(true);
-        $constraint = $reflectedConstraint->getValue($tokenFactory);
-        $this->assertInstanceOf(TokenFactory::class, $constraint);
+        $this->assertAttributeInstanceOf(TokenFactory::class, 'tokenFactory', $tokenFactory);
     }
 
-    public function testShouldReturnTokenStorage(): void
+    public function testShouldReturnTokenStorage()
     {
         /** @var Payum $payum */
-        $payum = static::getContainer()->get('payum');
+        $payum = static::$container->get('payum');
 
         $storage = $payum->getTokenStorage();
         $this->assertInstanceOf(StorageInterface::class, $storage);
     }
 
-    public function testShouldReturnStorages(): void
+    public function testShouldReturnStorages()
     {
         /** @var Payum $payum */
-        $payum = static::getContainer()->get('payum');
+        $payum = static::$container->get('payum');
 
         $storages = $payum->getStorages();
-        $this->assertIsArray($storages);
+        $this->assertInternalType('array', $storages);
         $this->assertCount(1, $storages);
     }
 
-    public function testShouldReturnGateways(): void
+    public function testShouldReturnGateways()
     {
         /** @var Payum $payum */
-        $payum = static::getContainer()->get('payum');
+        $payum = static::$container->get('payum');
 
         $gateways = $payum->getGateways();
-        $this->assertIsArray($gateways);
+        $this->assertInternalType('array', $gateways);
         $this->assertCount(2, $gateways);
     }
 
-    public function testShouldReturnGatewaysFactories(): void
+    public function testShouldReturnGatewaysFactories()
     {
         /** @var Payum $payum */
-        $payum = static::getContainer()->get('payum');
+        $payum = static::$container->get('payum');
 
         $factories = $payum->getGatewayFactories();
-        $this->assertIsArray($factories);
-        $this->assertGreaterThan(5, count($factories));
+        $this->assertInternalType('array', $factories);
+        $this->assertGreaterThan(10, count($factories));
     }
 
-    public function testShouldReturnGatewayFactory(): void
+    public function testShouldReturnGatewayFactory()
     {
         /** @var Payum $payum */
-        $payum = static::getContainer()->get('payum');
+        $payum = static::$container->get('payum');
 
         $this->assertInstanceOf(PaypalExpressCheckoutGatewayFactory::class, $payum->getGatewayFactory('paypal_express_checkout'));
         $this->assertInstanceOf(StripeJsGatewayFactory::class, $payum->getGatewayFactory('stripe_js'));
     }
 
-    public function testShouldReturnGateway(): void
+    public function testShouldReturnGateway()
     {
         /** @var Payum $payum */
-        $payum = static::getContainer()->get('payum');
+        $payum = static::$container->get('payum');
 
         $this->assertInstanceOf(GatewayInterface::class, $payum->getGateway('fooGateway'));
         $this->assertInstanceOf(GatewayInterface::class, $payum->getGateway('barGateway'));
     }
 
-    public function testShouldReturnStorage(): void
+    public function testShouldReturnStorage()
     {
         /** @var Payum $payum */
-        $payum = static::getContainer()->get('payum');
+        $payum = static::$container->get('payum');
 
         $this->assertInstanceOf(StorageInterface::class, $payum->getStorage(ArrayObject::class));
     }

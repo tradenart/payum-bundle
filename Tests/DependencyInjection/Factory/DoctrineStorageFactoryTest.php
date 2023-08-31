@@ -10,7 +10,7 @@ class DoctrineStorageFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @test
      */
-    public function shouldBeSubClassOfAbstractStorageFactory(): void
+    public function shouldBeSubClassOfAbstractStorageFactory()
     {
         $rc = new \ReflectionClass('Payum\Bundle\PayumBundle\DependencyInjection\Factory\Storage\DoctrineStorageFactory');
 
@@ -20,16 +20,15 @@ class DoctrineStorageFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @test
      */
-    public function couldBeConstructedWithoutAnyArguments(): void
+    public function couldBeConstructedWithoutAnyArguments()
     {
-        $this->expectNotToPerformAssertions();
         new DoctrineStorageFactory;
     }
 
     /**
      * @test
      */
-    public function shouldAllowGetName(): void
+    public function shouldAllowGetName()
     {
         $factory = new DoctrineStorageFactory;
 
@@ -39,7 +38,7 @@ class DoctrineStorageFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @test
      */
-    public function shouldAllowAddConfiguration(): void
+    public function shouldAllowAddConfiguration()
     {
         $factory = new DoctrineStorageFactory;
 
@@ -60,7 +59,7 @@ class DoctrineStorageFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @test
      */
-    public function shouldAllowAddShortConfiguration(): void
+    public function shouldAllowAddShortConfiguration()
     {
         $factory = new DoctrineStorageFactory;
 
@@ -78,11 +77,12 @@ class DoctrineStorageFactoryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @test
+     *
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessageRegExp /The child (node|config) "driver" (at path|under) "foo" must be configured\./
      */
-    public function shouldRequireDriverOption(): void
+    public function shouldRequireDriverOption()
     {
-        $this->expectExceptionMessageMatches("/The child (node|config) \"driver\" (at path|under) \"foo\" must be configured\./");
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $factory = new DoctrineStorageFactory;
 
         $tb = new TreeBuilder('foo');

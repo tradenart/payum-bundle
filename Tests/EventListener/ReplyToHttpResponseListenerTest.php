@@ -4,36 +4,34 @@ namespace Payum\Bundle\PayumBundle\Tests\EventListener;
 use Payum\Bundle\PayumBundle\EventListener\ReplyToHttpResponseListener;
 use Payum\Core\Bridge\Symfony\ReplyToSymfonyResponseConverter;
 use Payum\Core\Reply\HttpRedirect;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Kernel;
 
-class ReplyToHttpResponseListenerTest extends TestCase
+class ReplyToHttpResponseListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test
      */
-    public function couldBeConstructedWithOneArgument(): void
+    public function couldBeConstructedWithOneArgument()
     {
-        $this->expectNotToPerformAssertions();
         new ReplyToHttpResponseListener($this->createReplyToSymfonyResponseConverterMock());
     }
 
     /**
      * @test
      */
-    public function shouldDoNothingIfExceptionNotInstanceOfReply(): void
+    public function shouldDoNothingIfExceptionNotInstanceOfReply()
     {
         $expectedException = new Exception;
 
         $event = new ExceptionEvent(
             $this->createHttpKernelMock(),
             new Request,
-            $this->getRequestType(),
+            Kernel::MASTER_REQUEST,
             $expectedException
         );
 
@@ -55,7 +53,7 @@ class ReplyToHttpResponseListenerTest extends TestCase
     /**
      * @test
      */
-    public function shouldSetResponseReturnedByConverterToEvent(): void
+    public function shouldSetResponseReturnedByConverterToEvent()
     {
         $expectedUrl = '/foo/bar';
 
@@ -65,7 +63,7 @@ class ReplyToHttpResponseListenerTest extends TestCase
         $event = new ExceptionEvent(
             $this->createHttpKernelMock(),
             new Request,
-            $this->getRequestType(),
+            Kernel::MASTER_REQUEST,
             $reply
         );
 
@@ -74,7 +72,7 @@ class ReplyToHttpResponseListenerTest extends TestCase
             ->expects($this->once())
             ->method('convert')
             ->with($this->identicalTo($reply))
-            ->willReturn($response)
+            ->will($this->returnValue($response))
         ;
 
         $listener = new ReplyToHttpResponseListener($converterMock);
@@ -88,19 +86,19 @@ class ReplyToHttpResponseListenerTest extends TestCase
     /**
      * @test
      */
-    public function shouldCallAllowCustomResponseCode(): void
+    public function shouldCallAllowCustomResponseCode()
     {
         $reply = new HttpRedirect('/foo/bar');
         $response = new Response('', 302);
 
-        $event = new ExceptionEvent($this->createHttpKernelMock(), new Request, $this->getRequestType(), $reply);
+        $event = new ExceptionEvent($this->createHttpKernelMock(), new Request, Kernel::MASTER_REQUEST, $reply);
 
         $converterMock = $this->createReplyToSymfonyResponseConverterMock();
         $converterMock
             ->expects($this->once())
             ->method('convert')
             ->with($this->identicalTo($reply))
-            ->willReturn($response)
+            ->will($this->returnValue($response))
         ;
 
         $listener = new ReplyToHttpResponseListener($converterMock);
@@ -113,27 +111,18 @@ class ReplyToHttpResponseListenerTest extends TestCase
     }
 
     /**
-     * @return MockObject|ReplyToSymfonyResponseConverter
+     * @return \PHPUnit_Framework_MockObject_MockObject|ReplyToSymfonyResponseConverter
      */
     protected function createReplyToSymfonyResponseConverterMock()
     {
-        return $this->createMock(ReplyToSymfonyResponseConverter::class);
+        return $this->createMock('Payum\Core\Bridge\Symfony\ReplyToSymfonyResponseConverter');
     }
 
     /**
-     * @return HttpKernelInterface|MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject|HttpKernelInterface
      */
     protected function createHttpKernelMock()
     {
-        return $this->createMock(HttpKernelInterface::class);
-    }
-
-    private function getRequestType(): int
-    {
-        if (defined(HttpKernelInterface::class . '::MAIN_REQUEST')) {
-            return HttpKernelInterface::MAIN_REQUEST;
-        }
-
-        return HttpKernelInterface::MASTER_REQUEST;
+        return $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
     }
 }

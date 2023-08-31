@@ -14,7 +14,7 @@ class StatusCommandTest extends WebTestCase
     /**
      * @test
      */
-    public function shouldReturnNewStatus(): void
+    public function shouldReturnNewStatus()
     {
         /** @var RegistryInterface $payum */
         $payum = $this->client->getContainer()->get('payum');
@@ -27,16 +27,22 @@ class StatusCommandTest extends WebTestCase
 
         $modelId = $storage->identify($model)->getId();
 
-        $output = $this->executeConsole(new StatusCommand($payum), array(
+        $output = $this->executeConsole(new StatusCommand, array(
             'gateway-name' => 'fooGateway',
             '--model-class' => $modelClass,
             '--model-id' => $modelId
         ));
 
-        $this->assertStringContainsString("Status: new", $output);
+        $this->assertContains("Status: new", $output);
     }
 
-    protected function executeConsole(Command $command, array $arguments = array()): string
+    /**
+     * @param Command  $command
+     * @param string[] $arguments
+     *
+     * @return string
+     */
+    protected function executeConsole(Command $command, array $arguments = array())
     {
         $command->setApplication(new Application($this->client->getKernel()));
         if ($command instanceof ContainerAwareInterface) {
