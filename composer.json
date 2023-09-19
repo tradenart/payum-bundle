@@ -44,7 +44,8 @@
     "symfony/validator": "^4.4 || ^5.4 || ^6.0",
     "symfony/security-csrf": "^4.4 || ^5.4 || ^6.0",
     "symfony/polyfill-php80": "^1.26",
-    "ext-json": "*"
+    "ext-json": "*",
+    "league/iso3166": "^4.3"
   },
   "require-dev": {
     "defuse/php-encryption": "^2",
@@ -66,9 +67,7 @@
     "symfony/templating": "^4.4 || ^5.4 || ^6.0",
     "symfony/twig-bundle": "^4.4 || ^5.4 || ^6.0",
     "symfony/web-profiler-bundle": "^4.4 || ^5.4 || ^6.0",
-    "symfony/yaml": "^4.4 || ^5.4 || ^6.0",
-    "twig/twig": "^2.0 || ^3.0",
-    "league/iso3166": "^4.3"
+    "symfony/yaml": "^4.4 || ^5.4 || ^6.0"
   },
   "suggest": {
     "sonata-project/admin-bundle": "^3 If you want to configure payments in the backend."
