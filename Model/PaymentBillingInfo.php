@@ -42,6 +42,16 @@ class PaymentBillingInfo
      */
     public $countryCode;
 
+    /**
+     * @var string $mobilePhoneNumber mobile phone number (national format)
+     */
+    public $mobilePhoneNumber;
+
+	/**
+	 * @var string $mobilePhoneNumberCountryCode mobile phone number prefix (without leading +)
+	 */
+	public $mobilePhoneNumberCountryCode;
+
 
     /**
      * @param $firstName
@@ -51,6 +61,8 @@ class PaymentBillingInfo
      * @param $zipCode
      * @param $city
      * @param $countryCode
+     * @param $mobilePhoneNumber
+     * @param $mobilePhoneNumberCountryCode
      *
      * @return PaymentBillingInfo
      *
@@ -64,7 +76,9 @@ class PaymentBillingInfo
         $address2,
         $zipCode,
         $city,
-        $countryCode
+        $countryCode,
+		$mobilePhoneNumber,
+		$mobilePhoneNumberCountryCode
     )
     {
         $this->firstName = $this->enforceUtf8($firstName);
@@ -73,6 +87,9 @@ class PaymentBillingInfo
         $this->address2 = $this->enforceUtf8($address2);
         $this->zipCode = $this->enforceUtf8($zipCode);
         $this->city = $this->enforceUtf8($city);
+        $this->mobilePhoneNumber = $this->enforceUtf8($mobilePhoneNumber);
+        $this->mobilePhoneNumberCountryCode= $this->enforceUtf8($mobilePhoneNumberCountryCode);
+
         is_numeric($countryCode) ? $this->countryCode = $countryCode : $this->setCountryCode($countryCode);
 
         return $this;
@@ -95,6 +112,8 @@ class PaymentBillingInfo
             $data['zipCode'],
             $data['city'],
             $data['countryCode'],
+            $data['mobilePhoneNumber'],
+            $data['mobilePhoneNumberCountryCode'],
         );
     }
 
@@ -241,9 +260,35 @@ class PaymentBillingInfo
             'address2' => $this->address2,
             'zipCode' => $this->zipCode,
             'city' => $this->city,
-            'countryCode' => $this->countryCode
+            'countryCode' => $this->countryCode,
+            'mobilePhoneNumber' => $this->mobilePhoneNumber,
+            'mobilePhoneNumberCountryCode' => $this->mobilePhoneNumberCountryCode,
         ];
 
         return json_encode($data);
     }
+
+
+	public function setMobilePhoneNumber(?string $mobilePhoneNumber) : PaymentBillingInfo
+	{
+		$this->mobilePhoneNumber = $mobilePhoneNumber ? utf8_encode($mobilePhoneNumber) : null;
+		return $this;
+	}
+
+	public function setMobilePhoneNumberCountryCode(?string $mobilePhoneNumberCountryCode) : PaymentBillingInfo
+	{
+		$this->mobilePhoneNumberCountryCode = $mobilePhoneNumberCountryCode ? utf8_encode($mobilePhoneNumberCountryCode) : null;
+		return $this;
+	}
+
+	public function getMobilePhoneNumber() : ?string
+	{
+		return $this->mobilePhoneNumber;
+	}
+
+	public function getMobilePhoneNumberCountryCode() : ?string
+	{
+		return $this->mobilePhoneNumberCountryCode;
+	}
+
 }
